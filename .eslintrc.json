@@ -1,10 +1,15 @@
 {
   "env": {
     "node": true,
+    "es6": true,  
     "jest": true
   },
   "extends": "eslint:recommended",
   "rules": {
     "semi": ["error", "always"]
   }
+  "parserOptions": {
+    "ecmaVersion": 2018,  // ✅ або 2020, залежно від твоєї версії Node
+    "sourceType": "module"
+  },
 }
