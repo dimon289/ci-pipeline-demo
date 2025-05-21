@@ -20,6 +20,13 @@ jobs:
           node-version: '20'
       - run: npm install
       - run: npm run lint
+      - name: Send Slack notification on lint success
+        if: ${{ success() }}
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          message: "✅ Lint job completed successfully in ${{ github.repository }} (commit ${{ github.sha }})"
+          status: success
 
   test:
     runs-on: ubuntu-latest
@@ -31,6 +38,13 @@ jobs:
           node-version: '20'
       - run: npm install
       - run: npm test
+      - name: Send Slack notification on test success
+        if: ${{ success() }}
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          message: "✅ Test job completed successfully in ${{ github.repository }} (commit ${{ github.sha }})"
+          status: success
 
   docker:
     runs-on: ubuntu-latest
@@ -51,3 +65,11 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository }}:latest
+
+      - name: Send Slack notification on docker push success
+        if: ${{ success() }}
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          message: "✅ Docker image pushed successfully for ${{ github.repository }} (commit ${{ github.sha }})"
+          status: success
