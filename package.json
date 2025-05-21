@@ -5,6 +5,9 @@
     "test": "jest",
     "lint": "eslint ."
   },
+    "scripts": {
+    "build": "tsc"  // або будь-яка команда, яка збирає твій проєкт
+  }
   "devDependencies": {
     "eslint": "^8.0.0",
     "jest": "^29.0.0"
