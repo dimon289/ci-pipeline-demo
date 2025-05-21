@@ -62,3 +62,20 @@ jobs:
 
     - name: Verify Deployment
       run: kubectl rollout status deployment/my-app
+    - name: Get pods status
+      run: kubectl get pods -l app=my-app
+
+    - name: Describe pods
+      run: |
+        for pod in $(kubectl get pods -l app=my-app -o jsonpath='{.items[*].metadata.name}'); do
+          echo "Describing pod $pod"
+          kubectl describe pod $pod
+        done
+
+    - name: Get logs from pods
+      run: |
+        for pod in $(kubectl get pods -l app=my-app -o jsonpath='{.items[*].metadata.name}'); do
+          echo "Logs from pod $pod"
+          kubectl logs $pod
+        done
+
