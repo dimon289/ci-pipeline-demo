@@ -6,7 +6,7 @@
     "lint": "eslint ."
   },
     "scripts": {
-    "build": "tsc"  // або будь-яка команда, яка збирає твій проєкт
+    "build": "tsc"  
   }
   "devDependencies": {
     "eslint": "^8.0.0",
