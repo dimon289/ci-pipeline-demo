@@ -47,13 +47,14 @@ jobs:
       with:
         version: 'latest'
 
-    - name: Install minikube
+    - name: Install Kind
       run: |
-        curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-        sudo install minikube-linux-amd64 /usr/local/bin/minikube
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+        chmod +x ./kind
+        sudo mv ./kind /usr/local/bin/kind
 
-    - name: Start minikube
-      run: minikube start --driver=docker
+    - name: Create kind cluster
+      run: kind create cluster
 
     - name: Deploy to Kubernetes
       run: |
@@ -62,6 +63,7 @@ jobs:
 
     - name: Verify Deployment
       run: kubectl rollout status deployment/my-app
+
     - name: Get pods status
       run: kubectl get pods -l app=my-app
 
