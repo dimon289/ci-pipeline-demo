@@ -39,48 +39,52 @@ jobs:
           docker push ghcr.io/${{ github.repository }}:latest
 
   deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+   runs-on: ubuntu-latest
+   steps:
+    - uses: actions/checkout@v4
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'latest'
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
 
-      - name: Install minikube
-        run: |
-          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-          sudo install minikube-linux-amd64 /usr/local/bin/minikube
+    - name: Install minikube
+      run: |
+        curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        sudo install minikube-linux-amd64 /usr/local/bin/minikube
 
-      - name: Start minikube
-        run: minikube start --driver=docker
+    - name: Start minikube
+      run: minikube start --driver=docker
 
-      - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/service.yaml
+    - name: Set IMAGE_NAME env variable
+      run: echo "IMAGE_NAME=ghcr.io/${{ github.repository }}:latest" >> $GITHUB_ENV
 
-      - name: Verify Deployment
-        run: kubectl rollout status deployment/my-app
-        continue-on-error: true
+    - name: Substitute variables and deploy
+      run: |
+        envsubst < k8s/deployment.yaml | kubectl apply -f -
+        kubectl apply -f k8s/service.yaml
 
-      - name: Get pods status
-        if: always()
-        run: kubectl get pods -l app=my-app -o wide
+    - name: Verify Deployment
+      run: kubectl rollout status deployment/my-app
+      continue-on-error: true
 
-      - name: Describe pods
-        if: always()
-        run: |
-          for pod in $(kubectl get pods -l app=my-app -o jsonpath='{.items[*].metadata.name}'); do
-            echo "Describing pod $pod"
-            kubectl describe pod $pod
-          done
+    - name: Get pods status
+      if: always()
+      run: kubectl get pods -l app=my-app -o wide
 
-      - name: Get logs from pods
-        if: always()
-        run: |
-          for pod in $(kubectl get pods -l app=my-app -o jsonpath='{.items[*].metadata.name}'); do
-            echo "Logs from pod $pod"
-            kubectl logs $pod
-          done
+    - name: Describe pods
+      if: always()
+      run: |
+        for pod in $(kubectl get pods -l app=my-app -o jsonpath='{.items[*].metadata.name}'); do
+          echo "Describing pod $pod"
+          kubectl describe pod $pod
+        done
+
+    - name: Get logs from pods
+      if: always()
+      run: |
+        for pod in $(kubectl get pods -l app=my-app -o jsonpath='{.items[*].metadata.name}'); do
+          echo "Logs from pod $pod"
+          kubectl logs $pod
+        done
+
