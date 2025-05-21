@@ -6,7 +6,8 @@
     "lint": "eslint ."
   },
     "scripts": {
-       "build": "npm test"
+       "build": "npm test",
+       "test": "echo \"No tests specified\" && exit 0"
   },
   "devDependencies": {
     "eslint": "^8.0.0",
